@@ -1,0 +1,1 @@
+function isLetter(c) { return c.toLowerCase() != c.toUpperCase(); };style = window.getComputedStyle($0);keys = Object.keys(style).filter(key => isLetter(key));obj = keys.reduce((obj, key) => { obj[key] = style[key], {});
