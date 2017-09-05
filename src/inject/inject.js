@@ -1,7 +1,31 @@
-
-
 var origBackgroundColor = null;
 var origBorder = null;
+var current = null;
+var elementId = null;
+
+chrome.extension.onMessage.addListener(
+  function(request, sender, sendResponse) {
+		if (request.id === 'startLooking') {
+			document.addEventListener('mousemove', mouseMoveHandler)
+			document.addEventListener('click', clickHandler)
+		} else if (request.id === 'stopLooking') {
+			unHover(current);
+			document.addRemoveListener('mousemove', mouseMoveHandler)
+			document.addRemoveListener('click', clickHandler)
+		}
+  });
+
+function clickHandler() {
+	var element = window.getComputedStyle(current);
+	chrome.extension.sendMessage({
+		id: 'setElementWithId', elementId, element
+	}, _ => {});
+}
+function mouseMoveHandler(e) {
+	unHover(current);
+	current = e.target;
+	hover(e.target);
+}
 function hover(ele) {
 	origBackgroundColor = ele.style.backgroundColor
 	origBorder = ele.style.border
@@ -14,32 +38,3 @@ function unHover(ele) {
 	ele.style.border = origBorder
 	}
 }
-
-var current = null;
-
-document.addEventListener('click', (e) => {
-	var element = window.getComputedStyle(current);
-	chrome.extension.sendMessage({
-		element
-	}, function(res) {
-		if(res) console.log('res', res)
-		// var readyStateCheckInterval = setInterval(function() {
-		// if (document.readyState === "complete") {
-		// 	clearInterval(readyStateCheckInterval);
-
-		// 	// ----------------------------------------------------------
-		// 	// This part of the script triggers when page is done loading
-		// 	console.log("Hello. This message was sent from scripts/inject.js");
-		// 	// ----------------------------------------------------------
-
-		// }
-		// }, 10);
-	});
-})
-document.addEventListener('mousemove', (e) => {
-	unHover(current);
-	current = e.target;
-	hover(e.target);
-})
-// document.addEventListener('DOMContentLoaded', _ => {
-// });	
